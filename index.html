@@ -1,52 +1,126 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    onAuthStateChanged 
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIFA - Africa's Cultural Universe</title>
+</head>
+<body>
+  <h1>Welcome to SIFA - Africa's Cultural Universe</h1>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC84Hr1ud74JFr3HU_SoWHsqZt919TNsns",
-    authDomain: "sifa-1a32c.firebaseapp.com",
-    projectId: "sifa-1a32c",
-    storageBucket: "sifa-1a32c.firebasestorage.app",
-    messagingSenderId: "1023271372069",
-    appId: "1:1023271372069:web:65319ad1172f46fa6906cc",
-    measurementId: "G-ZY33FXCDE4"
-  };
+  <!-- Sign Up Form -->
+  <form id="signupForm">
+    <h2>Create Account</h2>
+    <label for="email">Email:</label>
+    <input type="email" id="signupEmail" required>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+    <label for="password">Password:</label>
+    <input type="password" id="signupPassword" required>
 
-  // Global variables for the rest of the app
-  window.firebaseApp = app;
-  window.auth = auth;
-  window.db = db;
-  window.storage = storage;
-  window.currentUser = null;
-  window.fbOK = false;
+    <button type="submit">Sign Up</button>
+  </form>
 
-  // Enable Firestore offline persistence
-  enableIndexedDbPersistence(db)
-    .then(() => console.log("%c✅ Firestore persistence enabled", "color: #22D3EE"))
-    .catch((err) => console.warn("Firestore persistence warning:", err.message));
+  <!-- Login Form -->
+  <form id="loginForm">
+    <h2>Login</h2>
+    <label for="email">Email:</label>
+    <input type="email" id="loginEmail" required>
 
-  // Auth state listener
-  onAuthStateChanged(auth, (user) => {
-    window.currentUser = user;
-    if (user) {
-      console.log("%c✅ User signed in:", user.uid, "color: #22D3EE; font-weight: bold");
-      window.fbOK = true;
-    } else {
-      window.fbOK = false;
-    }
-  });
+    <label for="password">Password:</label>
+    <input type="password" id="loginPassword" required>
 
-  console.log("%c✅ Firebase v10 Modular SDK initialized successfully", "color: #22D3EE; font-weight: bold");
-</script>
+    <button type="submit">Log In</button>
+  </form>
+
+  <script type="module">
+    // Firebase initialization
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC84Hr1ud74JFr3HU_SoWHsqZt919TNsns",
+      authDomain: "sifa-1a32c.firebaseapp.com",
+      projectId: "sifa-1a32c",
+      storageBucket: "sifa-1a32c.firebasestorage.app",
+      messagingSenderId: "1023271372069",
+      appId: "1:1023271372069:web:65319ad1172f46fa6906cc",
+      measurementId: "G-ZY33FXCDE4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Global variables for other functionalities
+    window.firebaseApp = app;
+    window.auth = auth;
+    window.db = db;
+    window.storage = storage;
+    window.currentUser = null;
+    window.fbOK = false;
+
+    enableIndexedDbPersistence(db)
+      .then(() => console.log("%c✅ Firestore persistence enabled", "color: #22D3EE"))
+      .catch(err => console.warn("Firestore persistence warning:", err.message));
+
+    // Auth state listener
+    onAuthStateChanged(auth, (user) => {
+      window.currentUser = user;
+      if (user) {
+        console.log("%c✅ User signed in:", user.uid, "color: #22D3EE; font-weight: bold");
+        window.fbOK = true;
+      } else {
+        window.fbOK = false;
+      }
+    });
+
+    // Signup function
+    document.getElementById('signupForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+
+      createUserWithEmailAndPassword(window.auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("Account created successfully:", user);
+          alert("Account created successfully!");
+          // Add redirection logic here if needed
+        })
+        .catch((error) => {
+          console.error("Signup Error:", error.code, error.message);
+          alert("Error: " + error.message);
+        });
+    });
+
+    // Login function
+    document.getElementById('loginForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      signInWithEmailAndPassword(window.auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("Login successful:", user);
+          alert("Login successful!");
+          // Add redirection logic here if needed
+        })
+        .catch((error) => {
+          console.error("Login Error:", error.code, error.message);
+          alert("Error: " + error.message);
+        });
+    });
+
+    console.log("%c✅ Firebase v10 Modular SDK initialized successfully", "color: #22D3EE; font-weight: bold");
+  </script>
+</body>
+</html>
